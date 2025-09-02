@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { margin-top: 40px; }
+        h2 { margin-bottom: 30px; text-align: center; }
+        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 0.9rem; }
+        .confirmed { background-color: #198754; color: white; }
+        .pending { background-color: #ffc107; color: black; }
+        .cancelled { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Back to Home -->
+    <div class="mb-3">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Back to Home</a>
+    </div>
+
+    <h2>My Bookings</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if bookings %}
+    <!-- Search -->
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Name...">
+    </div>
+
+    <table class="table table-bordered table-striped" id="bookingTable">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th> 
+                <th>Contact</th>
+                <th>Pickup</th>
+                <th>Drop</th>
+                <th>Distance (km)</th>
+                <th>Fare (₹)</th>
+                <th>Vehicle Type</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Cancel Reason</th>  
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.name }}</td>
+                <td>{{ booking.user }}</td>
+                <td>{{ booking.phone }}</td>
+                <td>{{ booking.pickup }}</td>
+                <td>{{ booking.drop }}</td>
+                <td>{{ booking.distance }} km</td>
+                <td>₹ {{ "%.2f"|format(booking.final_fare) }}</td>
+                <td>{{ booking.vehicle_type }}</td> 
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.time }}</td>
+
+                <!-- Status -->
+                <td>
+                    {% if booking.status == "Confirmed" %}
+                        <span class="status-badge confirmed">Confirmed</span>
+                    {% elif booking.status == "Pending" %}
+                        <span class="status-badge pending">Pending</span>
+                    {% elif booking.status == "Cancelled" %}
+                        <span class="status-badge cancelled">Cancelled</span>
+                    {% else %}
+                        <span class="status-badge">{{ booking.status }}</span>
+                    {% endif %}
+                </td>
+
+                <!-- Cancel Reason -->
+                <td>
+                    {% if booking.status == "Cancelled" %}
+                        {{ booking.cancel_reason or "No reason provided" }}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+
+                <!-- Action -->
+                <td>
+                    {% if booking.status != "Cancelled" %}
+                        <!-- Cancel Button -->
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal{{ booking._id }}">Cancel</button>
+
+                        <!-- Cancel Modal -->
+                        <div class="modal fade" id="cancelModal{{ booking._id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Cancel Booking</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <form action="{{ url_for('user_cancel_booking', booking_id=booking._id) }}" method="POST" class="cancel-form">
+                                <div class="modal-body">
+                                    <p>Select a reason for cancellation:</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input reason-radio" type="radio" name="cancel_reason" value="Change of plans" required>
+                                        <label class="form-check-label">Change of plans</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input reason-radio" type="radio" name="cancel_reason" value="Booked by mistake">
+                                        <label class="form-check-label">Booked by mistake</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input reason-radio" type="radio" name="cancel_reason" value="Driver delay">
+                                        <label class="form-check-label">Driver delay</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input reason-radio" type="radio" name="cancel_reason" value="Other">
+                                        <label class="form-check-label">Other</label>
+                                    </div>
+                                    <textarea class="form-control mt-2 d-none other-textarea" name="other_reason" placeholder="Enter other reason..."></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                  <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                    {% else %}
+                        <!-- View Invoice -->
+                        <a href="{{ url_for('cancelled_invoice', booking_id=booking._id) }}" class="btn btn-primary btn-sm">View Invoice</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center p-5">
+        <h5>No Bookings Found</h5>
+        <p>Looks like you haven't booked any rides yet.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Book a Ride</a>
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Search filter
+document.getElementById("searchInput").addEventListener("keyup", function () {
+  let filter = this.value.toLowerCase();
+  let rows = document.querySelectorAll("#bookingTable tbody tr");
+  rows.forEach(row => {
+    let nameCell = row.querySelector("td:first-child");
+    if (nameCell) {
+      let nameText = nameCell.textContent.toLowerCase();
+      row.style.display = nameText.includes(filter) ? "" : "none";
+    }
+  });
+});
+
+// Show/hide "Other reason" textarea
+document.querySelectorAll('.reason-radio').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const modalBody = this.closest('.modal-body');
+        const textarea = modalBody.querySelector('.other-textarea');
+        if (this.value === 'Other') {
+            textarea.classList.remove('d-none');
+            textarea.required = true;
+        } else {
+            textarea.classList.add('d-none');
+            textarea.required = false;
+        }
+    });
+});
+
+// Auto close alerts
+setTimeout(() => {
+  document.querySelectorAll('.alert').forEach(a => {
+    let bsAlert = new bootstrap.Alert(a);
+    bsAlert.close();
+  });
+}, 3000);
+
+// Auto close modal after cancel
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".cancel-form").forEach(form => {
+        form.addEventListener("submit", function () {
+            let modal = bootstrap.Modal.getInstance(this.closest(".modal"));
+            if (modal) { modal.hide(); }
+        });
+    });
+});
+</script>
+</body>
+</html>
