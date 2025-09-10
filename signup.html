@@ -1,131 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>User Signup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('signup.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Signup</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: url('signup.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
+    .form-container {
+        background-color: rgba(255, 255, 255, 0.85);
+        padding: 30px 25px;
+        border-radius: 15px;
+        box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        transition: transform 0.3s ease-in-out;
+        box-sizing: border-box;
+    }
+
+    .form-container:hover {
+        transform: scale(1.03);
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+        font-weight: bold;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+        font-size: 14px;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="tel"],
+    form input[type="password"] {
+        padding: 12px;
+        margin-top: 5px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: all 0.3s ease-in-out;
+    }
+
+    form input[type="text"]:focus,
+    form input[type="email"]:focus,
+    form input[type="tel"]:focus,
+    form input[type="password"]:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+
+    form input[type="submit"] {
+        background: linear-gradient(45deg, #4CAF50, #2ecc71);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: bold;
+        margin-top: 15px;
+        font-size: 16px;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    form input[type="submit"]:hover {
+        background: linear-gradient(45deg, #2ecc71, #27ae60);
+        transform: translateY(-2px);
+    }
+
+    .form-container p {
+        font-size: 13px;
+        margin-top: 15px;
+        color: #555;
+    }
+
+    .form-container p a {
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .form-container p a:hover {
+        text-decoration: underline;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 480px) {
         .form-container {
-            background-color: rgba(255, 255, 255, 0.505);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.4);
-            width: 350px;
-            text-align: center;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .form-container:hover {
-            transform: scale(1.03);
+            padding: 20px 15px;
         }
 
         h2 {
-            margin-bottom: 25px;
-            color: #2c3e50;
-            font-weight: bold;
-            font-size: 24px;
+            font-size: 20px;
+        }
+
+        label {
+            font-size: 13px;
         }
 
         form input[type="text"],
         form input[type="email"],
         form input[type="tel"],
         form input[type="password"] {
-            padding: 12px;
-            margin: 12px 0;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            outline: none;
+            padding: 10px;
             font-size: 14px;
-            transition: 0.3s;
-        }
-
-        form input[type="text"]:focus,
-        form input[type="email"]:focus,
-        form input[type="tel"]:focus,
-        form input[type="password"]:focus {
-            border-color: #4CAF50;
-            box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.4);
         }
 
         form input[type="submit"] {
-            background: linear-gradient(45deg, #4CAF50, #2ecc71);
-            color: white;
-            border: none;
             padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-            margin-top: 15px;
-            font-size: 16px;
-            transition: background 0.3s, transform 0.2s;
+            font-size: 15px;
         }
-
-        form input[type="submit"]:hover {
-            background: linear-gradient(45deg, #b908c3, #eb05d8);
-            transform: translateY(-2px);
-        }
-
-        label {
-            display: block;
-            margin-top: 12px;
-            text-align: left;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .form-container p {
-            font-size: 13px;
-            margin-top: 15px;
-            color: #555;
-        }
-
-        .form-container p a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .form-container p a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="form-container">
         <h2>User Signup</h2>
         <form method="POST" action="{{ url_for('signup') }}">
-    <label for="name">Name:</label>
-    <input type="text" name="name" required>
+            <label for="name">Name:</label>
+            <input type="text" name="name" required>
 
-    <label for="email">Email:</label>
-    <input type="email" name="email" required>
+            <label for="email">Email:</label>
+            <input type="email" name="email" required>
 
-    <label for="mobile">Phone Number:</label>
-    <input type="tel" name="mobile" required>
+            <label for="mobile">Phone Number:</label>
+            <input type="tel" name="mobile" required>
 
-    <label for="emergency_contact">Emergency Contact Number:</label>
-    <input type="tel" name="emergency_contact" required>
+            <label for="emergency_contact">Emergency Contact Number:</label>
+            <input type="tel" name="emergency_contact" required>
 
-    <label for="password">Password:</label>
-    <input type="password" name="password" required>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
 
-    <input type="submit" value="Signup">
-</form>
-
+            <input type="submit" value="Signup">
+        </form>
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
     </div>
 </body>
 </html>
-
