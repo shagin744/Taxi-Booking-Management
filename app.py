@@ -11,6 +11,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask_mail import Mail, Message 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 
 
 app = Flask(__name__)
@@ -34,6 +37,7 @@ drivers_collection = db["drivers"]
 bookings_collection = db["bookings"]
 payments_collection = db["payments"]
 notifications_collection = db["notifications"]
+fleet_collection = db["fleet"]
 
 # -------------------------
 # Email / SMS Config
@@ -591,10 +595,54 @@ def admin_dashboard():
 
 @app.route('/admin/users')
 def admin_users():
-    users = list(users_collection.find())
+    status_filter = request.args.get('status')  # Active / Inactive
+    query = {}
+    if status_filter:
+        query['status'] = status_filter
+    users = list(users_collection.find(query))
     for u in users:
-        u["_id"] = str(u["_id"])
-    return render_template("admin_users.html", users=users)
+        u["_id"] = str(u["_id"])  # Convert ObjectId to string
+    return render_template("admin_users.html", users=users, status_filter=status_filter)
+
+# --- Activate User ---
+@app.route('/admin/user/activate/<user_id>')
+def activate_user(user_id):
+    users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"status": "Active"}})
+    flash("✅ User activated successfully!", "success")
+    return redirect(url_for('admin_users'))
+
+# --- Deactivate User ---
+@app.route('/admin/user/inactive/<user_id>')
+def inactive_user(user_id):
+    users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"status": "Inactive"}})
+    flash("✅ User marked as Inactive", "success")
+    return redirect(url_for('admin_users'))
+
+# --- Delete User (Permanent) ---
+@app.route('/admin/user/delete/<user_id>')
+def delete_user(user_id):   # 👈 function name and template call should match
+    users_collection.delete_one({"_id": ObjectId(user_id)})
+    flash("🗑️ User deleted permanently!", "danger")
+    return redirect(url_for('admin_users'))
+
+# --- Edit User ---
+@app.route('/admin/users/edit/<user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if request.method == 'POST':
+        users_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {
+                "name": request.form.get('name', ''),
+                "email": request.form.get('email', ''),
+                "mobile": request.form.get('mobile', ''),
+                "emergency_contact": request.form.get('emergency_contact', ''),
+                "password": request.form.get('password', '')
+            }}
+        )
+        flash("✅ User details updated successfully!", "success")
+        return redirect(url_for('admin_users'))
+    return render_template("edit_user.html", user=user)
 
 @app.route('/admin/drivers')
 def admin_drivers():
@@ -617,38 +665,6 @@ def driver_signup():
     return render_template("driver_signup.html")
 
 
-@app.route('/admin/users/edit/<user_id>', methods=['GET', 'POST'])
-def edit_user(user_id):
-    user = users_collection.find_one({"_id": ObjectId(user_id)})
-    if request.method == 'POST':
-        users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {
-            "name": request.form['name'],
-            "email": request.form['email'],
-            "mobile": request.form['mobile'],
-            "emergency_contact": request.form['emergency_contact'],
-            "password": request.form['password']
-        }})
-        return redirect(url_for('admin_users'))
-    return render_template("edit_user.html", user=user)
-
-@app.route('/admin/users/delete/<user_id>', methods=['POST', 'GET'])
-def delete_user(user_id):
-    try:
-        # ✅ Instead of deleting, mark user as Inactive
-        result = users_collection.update_one(
-            {"_id": ObjectId(user_id)},
-            {"$set": {"status": "Inactive"}}
-        )
-
-        if result.modified_count:
-            flash("✅ User marked as Inactive. Bookings/payments remain for records.", "success")
-        else:
-            flash("❌ User not found.", "danger")
-
-    except Exception as e:
-        flash(f"⚠️ Error updating user: {str(e)}", "danger")
-
-    return redirect(url_for('admin_users'))
 
 
 @app.route('/admin/drivers/edit/<driver_id>', methods=['GET', 'POST'])
@@ -854,6 +870,67 @@ def ride_monitoring():
         rides=rides,
         google_api_key="AIzaSyBHHQPcdfSJBAbc0XUayV81ybnopaWWRBE"
     )
+
+
+@app.route("/admin/fleet")
+def admin_fleet():
+    status = request.args.get("status")
+    query = {}
+    if status:
+        query["status"] = status
+    vehicles = list(fleet_collection.find(query))
+    return render_template("admin_fleet.html", vehicles=vehicles)
+
+# --- Add Vehicle ---
+@app.route("/admin/add_vehicle", methods=["GET", "POST"])
+def add_vehicle():
+    if request.method == "POST":
+        data = {
+            "vehicle_no": request.form["vehicle_no"],
+            "model": request.form["model"],
+            "type": request.form["type"],
+            "capacity": int(request.form["capacity"]),
+            "insurance_expiry": request.form["insurance_expiry"],
+            "fitness_expiry": request.form["fitness_expiry"],
+            "driver_name": request.form.get("driver_name", "Unassigned"),
+            "status": "Active"
+        }
+        fleet_collection.insert_one(data)
+        return redirect(url_for("admin_fleet"))
+
+    drivers = list(drivers_collection.find())
+    return render_template("add_vehicle.html", drivers=drivers)
+
+
+@app.route('/admin/fleet/edit/<vehicle_id>', methods=['GET', 'POST'])
+def edit_vehicle(vehicle_id):
+    vehicle = fleet_collection.find_one({"_id": ObjectId(vehicle_id)})
+    if not vehicle:
+        flash("❌ Vehicle not found.", "danger")
+        return redirect(url_for('admin_fleet'))
+
+    if request.method == 'POST':
+        update_data = {
+            "registration_no": request.form['registration_no'],
+            "vehicle_type": request.form['vehicle_type'],
+            "capacity": request.form['capacity'],
+            "status": request.form['status'],
+            "insurance_expiry": request.form['insurance_expiry'],
+            "fitness_expiry": request.form['fitness_expiry'],
+            "assigned_driver": request.form.get('assigned_driver', None),
+        }
+        fleet_collection.update_one({"_id": ObjectId(vehicle_id)}, {"$set": update_data})
+        flash("✅ Vehicle updated successfully.", "success")
+        return redirect(url_for('admin_fleet'))
+
+    drivers = list(drivers_collection.find({"status": "Active"}))
+    return render_template("edit_vehicle.html", vehicle=vehicle, drivers=drivers)
+
+@app.route('/admin/fleet/delete/<vehicle_id>', methods=['POST'])
+def delete_vehicle(vehicle_id):
+    fleet_collection.delete_one({"_id": ObjectId(vehicle_id)})
+    flash("✅ Vehicle deleted successfully.", "success")
+    return redirect(url_for('admin_fleet'))
 
 # -------------------------
 # Run
