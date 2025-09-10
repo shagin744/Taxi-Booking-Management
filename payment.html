@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Payment</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url("{{ url_for('static', filename='payment.jpeg') }}") no-repeat center center fixed;
+            background: url('payment.jpeg') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             padding: 0;
@@ -15,48 +16,56 @@
             align-items: center;
             min-height: 100vh;
         }
+
         .container {
             max-width: 600px;
             width: 90%;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px 25px;
             border-radius: 20px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
             animation: fadeIn 1s ease-in-out;
         }
+
         @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(20px);}
-            to {opacity: 1; transform: translateY(0);}
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
         }
+
         h2 {
             text-align: center;
             color: #0072ff;
             margin-bottom: 25px;
-            font-size: 28px;
+            font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .details {
             background: #f4f8ff;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
         }
+
         .details p {
-            font-size: 16px;
-            margin: 8px 0;
+            font-size: 14px;
+            margin: 6px 0;
             color: #333;
         }
+
         .details span {
             font-weight: bold;
             color: #0072ff;
         }
+
         label {
             display: block;
             margin: 12px 0 6px;
             font-weight: bold;
             color: #444;
         }
+
         input[type="text"], input[type="email"], input[type="number"] {
             width: 100%;
             padding: 12px;
@@ -64,25 +73,34 @@
             border: 1px solid #ccc;
             border-radius: 8px;
             transition: all 0.3s ease-in-out;
+            box-sizing: border-box;
         }
+
         input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus {
             border-color: #0072ff;
             outline: none;
             box-shadow: 0 0 8px rgba(0,114,255,0.3);
         }
+
         .method-options {
             margin: 15px 0;
             display: flex;
-            justify-content: space-around;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
         }
+
         .method-options label {
             font-weight: 500;
             color: #333;
             cursor: pointer;
+            flex: 1 1 30%;
         }
+
         .method-options input {
             margin-right: 6px;
         }
+
         .btn {
             background: linear-gradient(135deg, #00c6ff, #0072ff);
             color: white;
@@ -96,19 +114,41 @@
             transition: all 0.3s ease;
             margin-top: 10px;
         }
+
         .btn:hover {
             background: linear-gradient(135deg, #0072ff, #0056d6);
             transform: scale(1.03);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
+
         .hidden {
             display: none;
         }
+
         .note {
             margin-top: 15px;
             font-size: 13px;
             text-align: center;
             color: #666;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .details p {
+                font-size: 13px;
+            }
+
+            .method-options label {
+                flex: 1 1 100%;
+            }
         }
     </style>
     <script>
@@ -133,7 +173,7 @@
             <p><span>Email:</span> {{ email }}</p>
             <p><span>Pickup:</span> {{ pickup }}</p>
             <p><span>Drop:</span> {{ drop }}</p>
-            <p><span>Vehicle Type:</span> {{ vehicle_type }}</p> <!-- ✅ Vehicle Type added -->
+            <p><span>Vehicle Type:</span> {{ vehicle_type }}</p>
             <p><span>Distance:</span> {{ distance }} km</p>
             <p><span>Fare:</span> ₹{{ fare }}</p>
             <p><span>Discount:</span> ₹{{ discount_amount }}</p>
@@ -142,14 +182,13 @@
             <p><span>Time:</span> {{ time }}</p>
         </div>
 
-        <!-- Payment Form -->
         <form method="POST" action="/payment">
             <input type="hidden" name="booking_id" value="{{ booking_id }}">
             <input type="hidden" name="name" value="{{ name }}">
             <input type="hidden" name="email" value="{{ email }}">
             <input type="hidden" name="pickup" value="{{ pickup }}">
             <input type="hidden" name="drop" value="{{ drop }}">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}"> <!-- ✅ Hidden field -->
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
             <input type="hidden" name="distance" value="{{ distance }}">
             <input type="hidden" name="final_fare" value="{{ final_fare }}">
             <input type="hidden" name="date" value="{{ date }}">
