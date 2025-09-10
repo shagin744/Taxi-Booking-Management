@@ -1,57 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Notifications</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background-color: #f4f4f4;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f4f4f4;
+        margin: 0;
+    }
 
-        .container {
-            max-width: 700px;
-            margin: auto;
+    .container {
+        max-width: 700px;
+        margin: auto;
+        width: 100%;
+    }
+
+    h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+    }
+
+    .notification {
+        background: #fff;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+        word-wrap: break-word;
+    }
+
+    .notification:hover {
+        transform: scale(1.02);
+    }
+
+    .message {
+        font-size: 16px;
+        color: #222;
+        margin-bottom: 5px;
+    }
+
+    .timestamp {
+        font-size: 0.85em;
+        color: #666;
+    }
+
+    .no-data {
+        text-align: center;
+        font-style: italic;
+        color: #888;
+        margin-top: 30px;
+        font-size: 1rem;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 480px) {
+        body {
+            padding: 15px;
         }
 
         h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 1.5rem;
         }
 
         .notification {
-            background: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .notification:hover {
-            transform: scale(1.01);
+            padding: 12px 15px;
         }
 
         .message {
-            font-size: 16px;
-            color: #222;
+            font-size: 14px;
         }
 
         .timestamp {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
+            font-size: 0.8em;
         }
-
-        .no-data {
-            text-align: center;
-            font-style: italic;
-            color: #888;
-            margin-top: 30px;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -61,9 +90,7 @@
             {% for n in notifications %}
                 <div class="notification">
                     <div class="message">{{ n.message }}</div>
-                    <div class="timestamp">
-                        {{ n.timestamp }}
-                    </div>
+                    <div class="timestamp">{{ n.timestamp }}</div>
                 </div>
             {% endfor %}
         {% else %}
