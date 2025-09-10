@@ -3,11 +3,12 @@
 <head>
   <title>Book a Ride - Madurai</title>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Important for mobile -->
+  
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url("{{ url_for('static', filename='booking.jpeg') }}") no-repeat center center fixed;
+      background: url('booking.jpeg') no-repeat center center fixed;
       background-size: cover;
       margin: 0;
       padding: 0;
@@ -19,14 +20,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
+      padding: 20px;
     }
 
     .booking-card {
-      background: #ffffff92;
-      padding: 35px 40px;
+      background: #ffffffd9;
+      padding: 25px 20px;
       border-radius: 18px;
-      width: 380px;
+      width: 100%;
+      max-width: 400px;
       box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
       animation: fadeIn 0.7s ease-in-out;
       text-align: left;
@@ -39,23 +41,24 @@
 
     h2 {
       text-align: center;
-      color: #fff0f0;
+      color: #fff;
       background: linear-gradient(135deg, #007bff, #0056b3);
       padding: 12px;
       border-radius: 12px;
-      margin-bottom: 25px;
-      font-size: 22px;
+      margin-bottom: 20px;
+      font-size: 20px;
     }
 
     label {
       font-weight: 600;
       display: block;
-      margin-top: 15px;
+      margin-top: 12px;
       margin-bottom: 6px;
       color: #333;
+      font-size: 14px;
     }
 
-    input[type="text"], input[type="date"], input[type="time"], select {
+    input[type="text"], input[type="email"], input[type="date"], input[type="time"], select {
       width: 100%;
       padding: 10px 12px;
       border-radius: 8px;
@@ -66,6 +69,7 @@
     }
 
     input[type="text"]:focus,
+    input[type="email"]:focus,
     input[type="date"]:focus,
     input[type="time"]:focus,
     select:focus {
@@ -95,34 +99,43 @@
 
     button:hover, input[type="submit"]:hover {
       transform: translateY(-2px);
-      box-shadow: 0px 6px 14px rgba(187, 0, 121, 0.774);
-      background: #00ffff;
+      box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.3);
+      background: #00bcd4;
       color: #fff;
-      border-color: #00fff7;
-    }
-
-    .status-confirmed {
-      color: green;
-      font-weight: bold;
-    }
-    .status-pending {
-      color: orange;
-      font-weight: bold;
     }
 
     .btn-small {
       background: #ad0cb5;
-      color: #f3fbfe;
-      border: 1px solid #c711ca;
-      padding: 6px 10px;
-      font-size: 14px;
-      width: auto;
-      margin-top: 8px;
-    }
-    .btn-small:hover {
-      background: #00ff15;
       color: #fff;
-      border-color: #37ff00;
+      border: 1px solid #c711ca;
+      padding: 6px 8px;
+      font-size: 13px;
+      width: auto;
+      margin-top: 6px;
+      border-radius: 6px;
+    }
+
+    .btn-small:hover {
+      background: #00c853;
+      border-color: #00c853;
+    }
+
+    .status-confirmed { color: green; font-weight: bold; }
+    .status-pending { color: orange; font-weight: bold; }
+
+    /* ✅ Mobile adjustments */
+    @media (max-width: 600px) {
+      .booking-card {
+        padding: 20px 15px;
+        border-radius: 12px;
+      }
+      h2 {
+        font-size: 18px;
+        padding: 10px;
+      }
+      label { font-size: 13px; }
+      input, select, button { font-size: 14px; padding: 10px; }
+      .btn-small { font-size: 12px; padding: 5px 6px; }
     }
   </style>
 
@@ -180,61 +193,48 @@
 
       <form action="/booking" method="POST">
 
-        <!-- Name -->
         <label>Name:</label>
         <input type="text" name="name" value="{{ user_name }}" readonly>
 
-        <!-- User -->
         <label>User Email:</label>
         <input type="email" name="user_email" value="{{ user_email }}" readonly>
 
         <label>User Phone:</label>
         <input type="text" name="phone" value="{{ user_phone }}" readonly>
 
-        <!-- Driver -->
         <label>Driver Email:</label>
         <input type="text" name="driver" value="{{ assigned_driver_email if assigned_driver_email else 'Auto Assigned' }}" readonly>
         
-        <!-- Pickup -->
         <label for="pickup">Pickup Area:</label>
         <input type="text" name="pickup" id="pickup" onblur="calculateDistance()" required>
         <button type="button" class="btn-small" onclick="getCurrentArea('pickup')">📍 Use Current Location</button>
 
-        <!-- Drop -->
         <label for="drop">Drop Area:</label>
         <input type="text" name="drop" id="drop" onblur="calculateDistance()" required>
         <button type="button" class="btn-small" onclick="getCurrentArea('drop')">📍 Use Current Location</button>
 
-        <!-- Vehicle Type -->
-       <!-- Vehicle Type -->
-      <label for="vehicle_type">Vehicle Type:</label>
-      <select name="vehicle_type" id="vehicle_type" required>
-      <option value="" disabled selected>Select Vehicle Type</option>
-      <option value="Sedan (4 seats)">Sedan (4 seats)</option>
-      <option value="Hatchback (5 seats)">Hatchback (5 seats)</option>
-      <option value="SUV (7 seats)">SUV (7 seats)</option>
-      <option value="Minivan (5 seats)">Minivan (5 seats)</option>
-     </select>
+        <label for="vehicle_type">Vehicle Type:</label>
+        <select name="vehicle_type" id="vehicle_type" required>
+          <option value="" disabled selected>Select Vehicle Type</option>
+          <option value="Sedan (4 seats)">Sedan (4 seats)</option>
+          <option value="Hatchback (5 seats)">Hatchback (5 seats)</option>
+          <option value="SUV (7 seats)">SUV (7 seats)</option>
+          <option value="Minivan (5 seats)">Minivan (5 seats)</option>
+        </select>
 
-
-        <!-- Promo Code -->
         <label for="promo_code">Promo Code:</label>
         <input type="text" name="promo_code" id="promo_code" placeholder="Enter promo code">
 
-        <!-- Booking Type -->
         <label>Booking Type:</label>
         <input type="radio" name="type" value="instant" onclick="toggleScheduleFields()" checked> Instant
         <input type="radio" name="type" value="schedule" onclick="toggleScheduleFields()"> Schedule
 
-        <!-- Status -->
         <label>Status:</label>
         <span id="status" class="status-confirmed">Confirmed</span>
 
-        <!-- Date and Time -->
         <div id="scheduleFields" class="hidden">
           <label for="date">Date:</label>
           <input type="date" name="date">
-
           <label for="time">Time:</label>
           <input type="time" name="time">
         </div>
