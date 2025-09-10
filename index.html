@@ -19,16 +19,16 @@
       justify-content: flex-start;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 15px;
     }
 
     .container {
       background: rgba(255, 255, 255, 0.425);
-      padding: 40px 30px;
-      border-radius: 25px;
+      padding: 30px 20px;
+      border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
       text-align: center;
-      max-width: 900px;
+      max-width: 1000px;
       width: 100%;
       animation: fadeIn 1.2s ease-in-out;
       backdrop-filter: blur(10px);
@@ -36,16 +36,16 @@
 
     h1 {
       color: #111;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       font-weight: 800;
-      font-size: 2.3rem;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
       text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .btn-custom {
-      padding: 14px 28px;
-      font-size: 18px;
-      margin: 10px 0;
+      padding: 12px 20px;
+      font-size: 1rem;
+      margin: 8px 0;
       width: 100%;
       border-radius: 12px;
       font-weight: bold;
@@ -76,7 +76,7 @@
     }
 
     .btn:hover {
-      transform: scale(1.08);
+      transform: scale(1.05);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     }
 
@@ -86,8 +86,8 @@
     }
 
     .note {
-      margin-top: 20px;
-      font-size: 16px;
+      margin-top: 15px;
+      font-size: 15px;
       color: #333;
       font-style: italic;
       font-weight: 500;
@@ -99,8 +99,7 @@
     }
 
     .modules {
-      margin-top: 40px;
-      text-align: left;
+      margin-top: 30px;
     }
 
     .card {
@@ -112,6 +111,17 @@
     .card:hover {
       transform: translateY(-6px);
     }
+
+    /* Responsive tweaks */
+    @media (max-width: 576px) {
+      .btn-custom {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+      .card h5 {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -119,11 +129,21 @@
   <div class="container">
     <h1>🚖 Welcome to Ride Booking App</h1>
 
-    <!-- Portal Buttons -->
-    <a href="signup.html" class="btn btn-primary btn-custom">User Portal</a>
-    <a href="admin_users.html" class="btn btn-success btn-custom">Admin Dashboard</a>
-    <a href="user_bookings.html" class="btn btn-warning btn-custom">📑 My Bookings</a>
-    <a href="ride_monitoring.html" class="btn btn-monitoring btn-custom">🛰️ Ride Monitoring</a>
+    <!-- Portal Buttons (stack on mobile, 2x2 on larger screens) -->
+    <div class="row g-3">
+      <div class="col-12 col-sm-6">
+        <a href="signup.html" class="btn btn-primary btn-custom">User Portal</a>
+      </div>
+      <div class="col-12 col-sm-6">
+        <a href="admin_users.html" class="btn btn-success btn-custom">Admin Dashboard</a>
+      </div>
+      <div class="col-12 col-sm-6">
+        <a href="user_bookings.html" class="btn btn-warning btn-custom">📑 My Bookings</a>
+      </div>
+      <div class="col-12 col-sm-6">
+        <a href="ride_monitoring.html" class="btn btn-monitoring btn-custom">🛰️ Ride Monitoring</a>
+      </div>
+    </div>
 
     <p class="note">Choose your portal to get started.</p>
 
@@ -131,7 +151,7 @@
     <div class="modules">
       <h2 class="text-center mb-4">📂 All Modules</h2>
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        
+
         <div class="col">
           <div class="card p-3">
             <h5>Booking</h5>
@@ -195,5 +215,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
