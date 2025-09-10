@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Payment</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{{ url_for('static', filename='payment.jpeg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        h2 {
+            text-align: center;
+            color: #0072ff;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .details {
+            background: #f4f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .details p {
+            font-size: 16px;
+            margin: 8px 0;
+            color: #333;
+        }
+        .details span {
+            font-weight: bold;
+            color: #0072ff;
+        }
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: bold;
+            color: #444;
+        }
+        input[type="text"], input[type="email"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus {
+            border-color: #0072ff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(0,114,255,0.3);
+        }
+        .method-options {
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        .method-options label {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        .method-options input {
+            margin-right: 6px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #0072ff, #0056d6);
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        .note {
+            margin-top: 15px;
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+    <script>
+        function toggleFields() {
+            let method = document.querySelector('input[name="method"]:checked').value;
+            document.getElementById("card-fields").classList.add("hidden");
+            document.getElementById("crypto-fields").classList.add("hidden");
+
+            if (method === "card") {
+                document.getElementById("card-fields").classList.remove("hidden");
+            } else if (method === "crypto") {
+                document.getElementById("crypto-fields").classList.remove("hidden");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>💳 Confirm Payment</h2>
+        <div class="details">
+            <p><span>Name:</span> {{ name }}</p>
+            <p><span>Email:</span> {{ email }}</p>
+            <p><span>Pickup:</span> {{ pickup }}</p>
+            <p><span>Drop:</span> {{ drop }}</p>
+            <p><span>Vehicle Type:</span> {{ vehicle_type }}</p> <!-- ✅ Vehicle Type added -->
+            <p><span>Distance:</span> {{ distance }} km</p>
+            <p><span>Fare:</span> ₹{{ fare }}</p>
+            <p><span>Discount:</span> ₹{{ discount_amount }}</p>
+            <p><span>Final Fare:</span> ₹{{ final_fare }}</p>
+            <p><span>Date:</span> {{ date }}</p>
+            <p><span>Time:</span> {{ time }}</p>
+        </div>
+
+        <!-- Payment Form -->
+        <form method="POST" action="/payment">
+            <input type="hidden" name="booking_id" value="{{ booking_id }}">
+            <input type="hidden" name="name" value="{{ name }}">
+            <input type="hidden" name="email" value="{{ email }}">
+            <input type="hidden" name="pickup" value="{{ pickup }}">
+            <input type="hidden" name="drop" value="{{ drop }}">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}"> <!-- ✅ Hidden field -->
+            <input type="hidden" name="distance" value="{{ distance }}">
+            <input type="hidden" name="final_fare" value="{{ final_fare }}">
+            <input type="hidden" name="date" value="{{ date }}">
+            <input type="hidden" name="time" value="{{ time }}">
+
+            <label>Payment Method:</label>
+            <div class="method-options">
+                <label><input type="radio" name="method" value="cash" checked onclick="toggleFields()"> Cash</label>
+                <label><input type="radio" name="method" value="card" onclick="toggleFields()"> Card</label>
+                <label><input type="radio" name="method" value="crypto" onclick="toggleFields()"> Crypto</label>
+            </div>
+
+            <div id="card-fields" class="hidden">
+                <label>Card Number:</label>
+                <input type="text" name="card_number" placeholder="Enter Card Number">
+                <label>Expiry Date:</label>
+                <input type="text" name="expiry_date" placeholder="MM/YY">
+                <label>CVV:</label>
+                <input type="number" name="cvv" placeholder="***">
+            </div>
+
+            <div id="crypto-fields" class="hidden">
+                <label>Crypto Address:</label>
+                <input type="text" name="crypto_address" placeholder="Enter Wallet Address">
+            </div>
+
+            <button type="submit" class="btn">💰 Pay Now</button>
+            <p class="note">Your payment is secure and encrypted 🔒</p>
+        </form>
+    </div>
+</body>
+</html>

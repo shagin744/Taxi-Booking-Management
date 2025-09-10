@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Users</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #ffffffc7;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 50px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        thead { 
+            background: linear-gradient(to right, #0d6efd, #00c6ff); 
+            color: white; 
+        }
+
+        tbody tr:hover { 
+            background-color: #e3f2fd; 
+            transform: scale(1.01); 
+            transition: 0.3s; 
+        }
+
+        .badge { font-size: 0.9em; }
+        .search-box { width: 250px; transition: width 0.4s ease-in-out; }
+        .search-box:focus { width: 350px; }
+    </style>
+
+    <script>
+        function searchUsers() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let rows = document.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(input) ? "" : "none";
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>👥 User Management</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Back to Dashboard button -->
+    <div class="mb-3">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">⬅ Back to Dashboard</a>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-sm {% if not status_filter %}active{% endif %}">All</a>
+            <a href="{{ url_for('admin_users', status='Active') }}" class="btn btn-success btn-sm {% if status_filter=='Active' %}active{% endif %}">Active</a>
+            <a href="{{ url_for('admin_users', status='Inactive') }}" class="btn btn-secondary btn-sm {% if status_filter=='Inactive' %}active{% endif %}">Inactive</a>
+        </div>
+        <input type="text" id="searchInput" onkeyup="searchUsers()" placeholder="🔍 Search users..." class="form-control search-box">
+    </div>
+
+    <!-- Users Table -->
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>👤 Name</th>
+                <th>📧 Email</th>
+                <th>📱 Mobile</th>
+                <th>Status</th>
+                <th>⚡ Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user['name'] }}</td>
+                <td>{{ user['email'] }}</td>
+                <td>{{ user['mobile'] }}</td>
+                <td>
+                    {% if user.get('status') == 'Active' %}
+                        <span class="badge bg-success">Active</span>
+                    {% elif user.get('status') == 'Inactive' %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% else %}
+                        <span class="badge bg-warning">Unknown</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.get('status') != 'Active' %}
+                        <a href="{{ url_for('activate_user', user_id=user['_id']) }}" class="btn btn-success btn-sm">Activate</a>
+                    {% endif %}
+                    {% if user.get('status') != 'Inactive' %}
+                        <a href="{{ url_for('inactive_user', user_id=user['_id']) }}" class="btn btn-secondary btn-sm">Deactivate</a>
+                    {% endif %}
+                    <a href="{{ url_for('edit_user', user_id=user['_id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ url_for('delete_user', user_id=user['_id']) }}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Are you sure you want to delete this user? This action is permanent.')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

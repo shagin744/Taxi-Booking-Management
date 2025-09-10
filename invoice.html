@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ride Booking Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f7;
+            background: url("{{ url_for('static', filename='invoice.jpeg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        .invoice-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffffa7;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .confirmed { background-color: #198754; color: white; }
+        .pending { background-color: #ffc107; color: black; }
+        .cancelled { background-color: #dc3545; color: white; }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #555;
+            font-size: 14px;
+        }
+        .back-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto 0;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <h2>Ride Booking Invoice</h2>
+
+        <p><span class="bold">Name:</span> {{ booking.name }}</p>
+        <p><span class="bold">Email:</span> {{ booking.email }}</p>
+        <p><span class="bold">Pickup:</span> {{ booking.pickup }}</p>
+        <p><span class="bold">Drop:</span> {{ booking.drop }}</p>
+        <p><span class="bold">Distance:</span> {{ booking.distance }} km</p>
+        <p><span class="bold">Vehicle Type:</span> {{ booking.vehicle_type }}</p>   <!-- ✅ Added line -->
+        <p><span class="bold">Date:</span> {{ booking.date }}</p>
+        <p><span class="bold">Time:</span> {{ booking.time }}</p>
+
+        <hr>
+
+        <p><span class="bold">Original Fare:</span> ₹{{ booking.original_fare }}</p>
+        <p><span class="bold">Discount:</span> ₹{{ booking.discount_amount }} ({{ booking.discount_percent }}%)</p>
+        <p><span class="bold">Final Fare Paid:</span> ₹{{ booking.final_fare }}</p>
+        <p><span class="bold">Promo Code:</span> {{ booking.promo_code }}</p>
+        <p><span class="bold">Payment Method:</span> {{ booking.payment_method }}</p>
+
+        <hr>
+
+        <p>Status: 
+            {% if booking.status == "Confirmed" %}
+                <span class="status confirmed">{{ booking.status }}</span>
+            {% elif booking.status == "Pending" %}
+                <span class="status pending">{{ booking.status }}</span>
+            {% elif booking.status == "Admin Cancelled" %}
+                <span class="status admin-cancelled">{{ booking.status }}</span>
+            {% else %}
+                <span class="status cancelled">{{ booking.status }}</span>
+            {% endif %}
+        </p>
+       {% if booking.cancel_reason %}
+    <p><span class="bold">Cancel Reason:</span> {{ booking.cancel_reason }}</p>
+        {% endif %}
+        <p class="footer">Thank you for using our Ride Booking Service!</p>
+
+        <a href="{{ url_for('index') }}" class="back-btn">Back to Home</a>
+        <a href="{{ url_for('communication') }}" class="back-btn">Back to Communication</a>
+    </div>
+</body>
+</html>

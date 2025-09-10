@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safety - Emergency Contact</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f6f9;
+            padding: 30px;
+        }
+        .safety-box {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: auto;
+            text-align: center;
+        }
+        .safety-box h2 {
+            color: #e74c3c;
+        }
+        .emergency-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="safety-box">
+        <h2>Emergency Contact</h2>
+        <p>Hello <strong>{{ name }}</strong>,</p>
+        <p>If you're in danger or need urgent help, use the emergency number below:</p>
+        <div class="emergency-number">{{ emergency }}</div>
+    </div>
+</body>
+</html>
+
+

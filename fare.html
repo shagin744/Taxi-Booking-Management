@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fare Details</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{{ url_for('static', filename='fare.jpeg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .container {
+            width: 65%;
+            max-width: 800px;
+            background: #ffffffd9;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        table th {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        table tr:hover td {
+            background: #f1f9ff;
+            transition: 0.3s;
+        }
+
+        .final {
+            font-weight: bold;
+            font-size: 18px;
+            color: #e74c3c;
+        }
+
+        .btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #2980b9, #1f6391);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="container">
+            <h2>Fare Summary</h2>
+            <table>
+                <tr>
+                    <th>Pickup</th>
+                    <td>{{ booking.pickup }}</td>
+                </tr>
+                <tr>
+                    <th>Drop</th>
+                    <td>{{ booking.drop }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Type</th>
+                    <td>{{ booking.vehicle_type }}</td>
+                </tr>
+                <tr>
+                    <th>Distance</th>
+                    <td>{{ booking.distance }} km</td>
+                </tr>
+                <tr>
+                    <th>Base Fare</th>
+                    <td>₹ {{ booking.original_fare }}</td>
+                </tr>
+                <tr>
+                    <th>Promo Discount</th>
+                    <td>- ₹ {{ booking.discount_amount }} ({{ booking.discount_percent }}%)</td>
+                </tr>
+                <tr>
+                    <th class="final">Final Fare</th>
+                    <td class="final">₹ {{ booking.final_fare }}</td>
+                </tr>
+            </table>
+            <a href="/payment/{{ booking._id }}" class="btn">Proceed to Payment</a>
+        </div>
+    </div>
+</body>
+</html>
